@@ -2,9 +2,9 @@ package com.wz.util;
 
 import com.wz.model.Response;
 
-public class ResponseUtil {
+public class ResponseUtils {
 
-    private ResponseUtil() {
+    private ResponseUtils() {
 
     }
 

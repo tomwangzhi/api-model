@@ -1,9 +1,11 @@
 package com.wz.controller;
 
+import com.wz.aop.Limit;
 import com.wz.aop.LocalLock;
 import com.wz.exception.CustomException;
 import com.wz.model.entity.CameraInfo;
 import com.wz.model.Response;
+import com.wz.model.entity.Order;
 import com.wz.model.param.CameraInfoPARAM;
 import com.wz.service.impl.CameraInfoServiceImpl;
 import com.wz.util.ResponseUtils;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.constraints.NotEmpty;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -108,7 +112,20 @@ public class CameraController extends SuperController{
     @GetMapping(value = "/test")
     @ApiOperation(value = "时间参数校验测试")
     @LocalLock(key = "book:arg[0]")  // 防止重复提交的注解
+    @Limit(prefix = "test",period = 100,count = 10) // 100秒10次
     public Response testTimeValidate(@RequestParam("date") @DateTime(message = "输入的格式错误，正确的格式为{format}",format = "yyyy-DD-dd") String date) {
         return ResponseUtils.success("校验成功");
+    }
+
+    @GetMapping(value = "/time")
+    @ApiOperation(value = "测试格式化的时间")
+    @Limit(prefix = "order",period = 1,count = 2)
+    public Order getOrderJson() {
+        Order order = new Order();
+        order.setDate(LocalDateTime.now());
+        order.setId(1);
+        order.setPrice(new BigDecimal(9.99));
+        order.setUserName("test");
+        return order;
     }
 }

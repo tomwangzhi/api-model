@@ -1,11 +1,13 @@
 package com.wz.controller;
 
+import com.wz.aop.LocalLock;
 import com.wz.exception.CustomException;
 import com.wz.model.entity.CameraInfo;
 import com.wz.model.Response;
 import com.wz.model.param.CameraInfoPARAM;
 import com.wz.service.impl.CameraInfoServiceImpl;
 import com.wz.util.ResponseUtils;
+import com.wz.validate.DateTime;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -31,6 +33,7 @@ import static com.wz.constant.ResponseEnum.CAMERAL_NOT_EXITS;
 @RequestMapping(value = "/camera")
 @Slf4j
 @Api(tags = {"camera-api"},description = "摄像头相关的restful api")
+@Validated
 public class CameraController extends SuperController{
 
     @Autowired
@@ -100,5 +103,12 @@ public class CameraController extends SuperController{
         }
         return ResponseUtils.success(cameraInfo);
 
+    }
+
+    @GetMapping(value = "/test")
+    @ApiOperation(value = "时间参数校验测试")
+    @LocalLock(key = "book:arg[0]")  // 防止重复提交的注解
+    public Response testTimeValidate(@RequestParam("date") @DateTime(message = "输入的格式错误，正确的格式为{format}",format = "yyyy-DD-dd") String date) {
+        return ResponseUtils.success("校验成功");
     }
 }
